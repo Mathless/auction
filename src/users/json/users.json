@@ -1,0 +1,16 @@
+{
+  "123e4567-e89b-12d3-a456-426614174000": {
+    "balance": 100,
+    "username": "qwe",
+    "password": "123",
+    "stocks": {"AAPL": 2},
+    "roles": ["user"]
+  },
+  "aac41f12-acbe-4a2d-a9fa-9e28dcb324e9": {
+    "username": "art",
+    "password": "123",
+    "balance": 120,
+    "stocks": {"AAPL": 1},
+    "roles": ["admin", "user"]
+  }
+}

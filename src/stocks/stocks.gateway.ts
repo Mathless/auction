@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { StocksService } from './stocks.service';
 
 @WebSocketGateway({
@@ -29,8 +29,8 @@ export class EventsGateway {
   }
 
   @SubscribeMessage('trading')
-  trading(): Observable<WsResponse> {
-    return this.stocksService.getTrading();
+  trading(client: Socket): Observable<WsResponse> {
+    return this.stocksService.getTrading(client);
   }
 
   @SubscribeMessage('identity')

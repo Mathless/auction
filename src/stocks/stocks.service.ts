@@ -1,10 +1,15 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { readdir, readFile } from 'fs';
 import * as path from 'path';
-import { interval, Observable, share } from 'rxjs';
+import { interval, Observable, share, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Socket } from 'socket.io';
 @Injectable()
 export class StocksService implements OnModuleInit {
+  private tradingSubscription: Subscription;
+  private currentData: any;
+  private tradingInterval: any;
+  private currentDate: Date;
   static getCompanyName(symbol: string) {
     switch (symbol) {
       case 'AAPL':
@@ -78,7 +83,10 @@ export class StocksService implements OnModuleInit {
     return Object.fromEntries(
       Object.keys(this.stocksData).map((symbol) => [
         symbol,
-        StocksService.getCompanyName(symbol),
+        {
+          value: StocksService.getCompanyName(symbol),
+          chosen: this.chosenCompanies[symbol] === true,
+        },
       ]),
     );
   }
@@ -100,26 +108,25 @@ export class StocksService implements OnModuleInit {
       if (!this.chosenCompanies[company]) continue;
       res[company] = this.stocksData[company][dateString];
     }
+    console.log(dateString, res);
     return res;
   }
 
   startTrading(startDate: Date, delay: number) {
-    this.trading = interval(delay * 1000).pipe(
-      map((index) => {
-        return {
-          event: 'trading',
-          data: this.getStocksByDate(
-            StocksService.addDays(startDate.toString(), index),
-          ),
-        };
-      }),
-      share(),
-    );
-    this.trading.subscribe();
+    clearInterval(this.tradingInterval);
+    this.currentDate = startDate;
+    if (this.tradingSubscription) this.tradingSubscription.unsubscribe();
+    this.tradingInterval = setInterval(() => {
+      this.currentDate = StocksService.addDays(this.currentDate.toString(), 1);
+      this.currentData = {
+        event: 'trading',
+        data: this.getStocksByDate(this.currentDate),
+      };
+    }, delay * 1000);
   }
 
-  getTrading() {
-    return this.trading;
+  getTrading(client: Socket) {
+    return this.currentData;
   }
 
   private processJson(fileContent: any, filename: string) {
