@@ -16,6 +16,14 @@ export class UsersService implements OnModuleInit {
     await this.initializeData();
   }
 
+  addStock(userId: string, companyName: string, amount: number, cost: number) {
+    this.users[userId].balance -= cost;
+    this.users[userId].stocks[companyName] = {
+      amount: this.users[userId].stocks[companyName]?.amount + amount,
+      cost: this.users[userId].stocks[companyName]?.cost + cost,
+    };
+    this.saveUsers();
+  }
   async findOne(username: string): Promise<User | undefined> {
     const user = find(this.users, (user) => user.username === username);
     user['id'] = findKey(this.users, user);
@@ -70,5 +78,20 @@ export class UsersService implements OnModuleInit {
 
   getUsers() {
     return this.users;
+  }
+
+  getUserById(id: string) {
+    const user = this.users[id];
+    delete user['password'];
+    return user;
+  }
+
+  sellStock(userId: string, companyName: string, amount, cost: number) {
+    this.users[userId].balance += cost;
+    this.users[userId].stocks[companyName] = {
+      amount: this.users[userId].stocks[companyName]?.amount - amount,
+      cost: this.users[userId].stocks[companyName]?.cost - cost,
+    };
+    this.saveUsers();
   }
 }

@@ -33,10 +33,10 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.User)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    return this.usersService.getUserById(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

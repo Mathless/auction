@@ -3,14 +3,20 @@
     "balance": 100,
     "username": "qwe",
     "password": "123",
-    "stocks": {"AAPL": 2},
+    "stocks": {"AAPL": {
+      "amount": 1,
+      "cost": 123
+    }},
     "roles": ["user"]
   },
   "aac41f12-acbe-4a2d-a9fa-9e28dcb324e9": {
     "username": "art",
     "password": "123",
     "balance": 120,
-    "stocks": {"AAPL": 1},
+    "stocks": {"AAPL": {
+      "amount": 1,
+      "cost": 123
+    }},
     "roles": ["admin", "user"]
   }
 }

@@ -9,7 +9,7 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { StocksService } from './stocks.service';
-
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -30,11 +30,15 @@ export class EventsGateway {
 
   @SubscribeMessage('trading')
   trading(client: Socket): Observable<WsResponse> {
-    return this.stocksService.getTrading(client);
+    return this.stocksService.getTrading();
   }
 
   @SubscribeMessage('identity')
   async identity(@MessageBody() data: number): Promise<number> {
     return data;
+  }
+  @OnEvent('trading')
+  listentToEvent(msg) {
+    this.server.emit('trading', msg.data);
   }
 }
